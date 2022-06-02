@@ -1,7 +1,7 @@
 ﻿#include "game.h"
 
 Game::Game() :
-	window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Jumper"), game_over(IMG + SPLASH), score_text(525, 10, 50, sf::Color::Yellow)
+	window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Jumper"),game_over(IMG + GAME_OVER), score_text(525, 10, 50, sf::Color::Yellow)
 {
 	//� ����� ���� ������ ������� �� ���� �����
 	Platform* p1 = new Platform(0, WINDOW_HEIGHT - 55.f,
@@ -35,6 +35,18 @@ void Game::check_events() {
 			if (event.key.code == sf::Keyboard::Space)
 				if (game_state == GameState::SPLASH) game_state = GameState::PLAY;
 	}
+	//fireball
+	if (event.type == sf::Event::MouseButtonPressed &&
+		event.mouseButton.button == sf::Mouse::Right)
+	{
+		sf::Time elapsed = clock.getElapsedTime();
+		if (elapsed.asSeconds() > 2) {
+			fireball_sprites.push_back(new Fireball(player.getPosition().x +
+				player.getWidth() / 2 - 5, player.getPosition().y));
+			clock.restart();
+		}
+	}
+
 }
 void Game::update() {
 	switch (game_state) {
@@ -42,6 +54,7 @@ void Game::update() {
 		break;
 	case GameState::PLAY:
 	{
+		for (auto it = fireball_sprites.begin(); it != fireball_sprites.end(); it++) { (*it)->update(); }
 		map.update();
 		score_text.update(std::to_string(score));
 		player.update();
@@ -91,9 +104,9 @@ void Game::draw() {
 	window.clear(BACKGROUND_COLOR);
 	switch (game_state) {
 	case GameState::SPLASH:
-		game_over.draw(window);
 		break;
 	case GameState::PLAY:
+		for (auto it = fireball_sprites.begin(); it != fireball_sprites.end(); it++) { (*it)->draw(window); }
 		map.draw(window);
 		score_text.draw(window);
 		player.draw(window);

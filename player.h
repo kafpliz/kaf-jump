@@ -57,4 +57,6 @@ public:
 		setPosition(sf::Vector2f(x, y));
 	}
 	void isDead();
+	size_t getWidth();
+	size_t getHeight();
 };
